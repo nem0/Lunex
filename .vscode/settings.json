@@ -1,0 +1,8 @@
+{
+    "zig.zls.enableArgumentPlaceholders": false,
+    "zig.zls.enableInlayHints": false,
+    "zig.formattingProvider": "off",
+    "[zig]" : {
+        "editor.formatOnSave": false    
+    }
+}

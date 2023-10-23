@@ -11,32 +11,32 @@ fn addGLFW(exe: *std.build.Step.Compile) void {
     exe.linkSystemLibraryName("d3d11");
     exe.linkSystemLibraryName("dxgi");
 
-    exe.addCSourceFiles(&.{"external/glfw/src/context.c"
-        , "external/glfw/src/init.c"
-        , "external/glfw/src/input.c"
-        , "external/glfw/src/monitor.c"
-        , "external/glfw/src/platform.c"
-        , "external/glfw/src/vulkan.c"
-        , "external/glfw/src/window.c"
-        , "external/glfw/src/null_init.c"
-        , "external/glfw/src/null_joystick.c"
-        , "external/glfw/src/null_monitor.c"
-        , "external/glfw/src/null_window.c"
-        , "external/glfw/src/win32_init.c"
-        , "external/glfw/src/win32_joystick.c"
-        , "external/glfw/src/win32_module.c"
-        , "external/glfw/src/win32_monitor.c"
-        , "external/glfw/src/win32_time.c"
-        , "external/glfw/src/win32_thread.c"
-        , "external/glfw/src/win32_window.c"
-        , "external/glfw/src/wgl_context.c"
-        , "external/glfw/src/egl_context.c"
-        , "external/glfw/src/osmesa_context.c"}, &.{});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/context.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/init.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/input.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/monitor.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/platform.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/vulkan.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/window.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/null_init.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/null_joystick.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/null_monitor.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/null_window.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/win32_init.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/win32_joystick.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/win32_module.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/win32_monitor.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/win32_time.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/win32_thread.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/win32_window.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/wgl_context.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/egl_context.c"), .flags = &.{}});
+    exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("external/glfw/src/osmesa_context.c"), .flags = &.{}});
 }
 
 fn addImGui(exe: *std.build.Step.Compile) void {
     exe.linkLibCpp();
-    exe.defineCMacro("SOKOL_GLCORE33", &.{});
+    exe.defineCMacro("SOKOL_D3D11", &.{});
     exe.defineCMacro("SOKOL_TRACE_HOOKS", &.{});
     exe.defineCMacro("SOKOL_IMGUI_NO_SOKOL_APP", &.{});
     exe.addIncludePath(std.build.LazyPath.relative("external/cimgui"));
@@ -110,11 +110,14 @@ pub fn build(b: *std.Build) void {
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.
     const unit_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/jobs.zig" },
+        .root_source_file = .{ .path = "src/renderer.zig" },
         .target = target,
         .optimize = optimize,
     });
     unit_tests.linkLibC();
+    addSokol(unit_tests);
+    addImGui(unit_tests);
+    addGLFW(unit_tests);
 
     const run_unit_tests = b.addRunArtifact(unit_tests);
 
